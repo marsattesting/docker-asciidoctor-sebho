@@ -48,6 +48,20 @@ FROM golang:${A2S_GOLANG_BUILDER_TAG} as a2s-builder
 ARG A2S_VERSION=ca82a5c
 RUN GOBIN=/app go install github.com/asciitosvg/asciitosvg/cmd/a2s@"${A2S_VERSION}"
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# Compile Mini-watcher
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+FROM node:20-alpine as mini-watcher-builder
+RUN apk add --no-cache git \
+&& GIT_SSL_NO_VERIFY=true \
+  git clone https://mini-watcher-token:glpat-GmRCsTw3Y1k2ycf3zfrs@alm9-gitlab-01.container.marsat/programmation/numedition/poc/mini-watcher.git -b main /app
+WORKDIR /app
+RUN npm install -g pnpm
+RUN pnpm install
+RUN pnpm build
+RUN npm install -g pkg
+RUN pnpm compile:alpine
+
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # \
 # Final image
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -57,6 +71,7 @@ LABEL maintainers="Guillaume Scheibel <guillaume.scheibel@gmail.com>, Damien DUP
 ## Always use the latest dependencies versions available for the current Alpine distribution
 # hadolint ignore=DL3018
 RUN apk add --no-cache \
+  libstdc++ \
   bash \
   curl \
   ca-certificates \
@@ -151,7 +166,18 @@ COPY --from=erd-builder /app/erd-go /usr/local/bin/
 # for backward compatibility
 RUN ln -snf /usr/local/bin/erd-go /usr/local/bin/erd
 
+COPY --from=mini-watcher-builder /app/_dist-bin-multi/mini-watcher /usr/local/bin/
+
+COPY asciidoctor-watch-inotify.sh /usr/local/bin/
+COPY asciidoctor-watch-polling.sh /usr/local/bin/
+COPY asciidoctor.sh /usr/local/bin/
+
+RUN mkdir /output && mkdir /extensions
+
+COPY extensions/ /extensions/
+
 WORKDIR /documents
 VOLUME /documents
+VOLUME /output
 
 CMD ["/bin/bash"]
