@@ -6,4 +6,17 @@
 #  echo /documents | entr -dnr asciidoctor $@
 #done;
 
-while inotifywait -r /documents -e create,delete,modify; do { $(cat /documents/.command/.configuration-asciidoctor); }; done
+while inotifywait -r /documents -e create,delete,modify; do 
+{
+  #CONF=$(cat /documents/.command/.configuration-asciidoctor)
+  #if [[ "${CONF}" == *"/output"* ]]; then
+  #    echo output
+  #    copy-distinct.sh
+  #else
+  #    echo no output
+  #    copy-unified.sh
+  #fi
+  copy.sh
+  $(cat /documents/.command/.configuration-asciidoctor);
+}; 
+done

@@ -6,4 +6,4 @@
 #  echo /documents | entr -dnr asciidoctor $@
 #done;
 
-mini-watcher -r /documents -s /documents/.command/.configuration-asciidoctor
+mini-watcher -r /documents -s copy.sh -s /documents/.command/.configuration-asciidoctor

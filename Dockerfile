@@ -54,7 +54,7 @@ RUN GOBIN=/app go install github.com/asciitosvg/asciitosvg/cmd/a2s@"${A2S_VERSIO
 FROM node:20-alpine as mini-watcher-builder 
 RUN apk add --no-cache git \
 && GIT_SSL_NO_VERIFY=true \
- git clone https://mini-watcher-token:glpat-GmRCsTw3Y1k2ycf3zfrs@alm9-gitlab-01.container.marsat/programmation/numedition/poc/mini-watcher.git -b main /app && echo 'toto'
+ git clone https://mini-watcher-token:glpat-GmRCsTw3Y1k2ycf3zfrs@alm9-gitlab-01.container.marsat/programmation/numedition/poc/mini-watcher.git -b v0.0.2 /app && echo 'toto'
 WORKDIR /app
 RUN npm install -g pnpm
 RUN pnpm install
@@ -174,6 +174,7 @@ COPY asciidoctor-watch-polling.sh /usr/local/bin/
 COPY asciidoctor.sh /usr/local/bin/
 COPY copy-unified.sh /usr/local/bin/
 COPY copy-distinct.sh /usr/local/bin/
+COPY copy.sh /usr/local/bin/
 
 RUN mkdir /output && mkdir /extensions
 
